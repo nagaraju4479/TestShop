@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -41,7 +42,7 @@ jobs:
       if: success() || failure()  # ✅ Ensures upload even if tests fail
       with:
           name: cucumber-html-report
-          path: target/cucumber-reports/  # ✅ Use forward slash `/` for compatibility
+          path: target/  # ✅ Use forward slash `/` for compatibility
 
     - name: Upload Selenium Logs (if any)
       uses: actions/upload-artifact@v4
