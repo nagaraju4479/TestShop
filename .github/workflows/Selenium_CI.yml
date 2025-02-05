@@ -1,0 +1,49 @@
+name: Java CI with Maven on Windows
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest  # ✅ Changed to Windows
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Cache Maven Dependencies
+      uses: actions/cache@v3
+      with:
+          path: C:\Users\runneradmin\.m2  # ✅ Windows path for Maven cache
+          key: maven-${{ hashFiles('**\pom.xml') }}
+          restore-keys: maven-
+
+    - name: Install Dependencies
+      run: mvn clean install -DskipTests
+
+    - name: Install ChromeDriver
+      uses: browser-actions/setup-chrome@latest
+
+    - name: Run Selenium Tests
+      run: mvn verify
+
+    - name: Upload Cucumber Reports
+      uses: actions/upload-artifact@v4  # ✅ Updated to v4
+      with:
+          name: cucumber-html-report
+          path: target\cucumber-reports\  # ✅ Updated Windows path
+
+    - name: Upload Selenium Logs (if any)
+      uses: actions/upload-artifact@v4  # ✅ Updated to v4
+      with:
+          name: selenium-logs
+          path: target\selenium.log  # ✅ Updated Windows path
