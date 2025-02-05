@@ -1,0 +1,54 @@
+
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Cache Maven Dependencies
+      uses: actions/cache@v3
+      with:
+          path: ~/.m2
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
+    - name: Install Dependencies
+      run: mvn clean install -DskipTests
+
+    - name: Install Latest Google Chrome
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+    - name: Verify Chrome Installation
+      run: google-chrome --version
+
+    - name: Run Selenium Tests
+      run: mvn test
+
+    - name: Upload Cucumber Reports
+      uses: actions/upload-artifact@v3
+      with:
+          name: cucumber-html-report
+          path: target/cucumber-html-report/
+
+    - name: Upload Selenium Logs (if any)
+      uses: actions/upload-artifact@v3
+      with:
+          name: selenium-logs
+          path: target/selenium.log
