@@ -30,11 +30,8 @@ jobs:
     - name: Install Dependencies
       run: mvn clean install -DskipTests
 
-    - name: Install Google Chrome
-      run: choco install googlechrome -y  # ✅ Chocolatey for Windows
-
     - name: Install ChromeDriver
-      run: choco install chromedriver -y  # ✅ Installs ChromeDriver
+      uses: browser-actions/setup-chrome@latest
 
     - name: Verify Chrome Installation
       run: google-chrome --version
