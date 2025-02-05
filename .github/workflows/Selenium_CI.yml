@@ -33,9 +33,6 @@ jobs:
     - name: Install ChromeDriver
       uses: browser-actions/setup-chrome@latest
 
-    - name: Verify Chrome Installation
-      run: google-chrome --version
-
     - name: Run Selenium Tests
       run: mvn verify
 
