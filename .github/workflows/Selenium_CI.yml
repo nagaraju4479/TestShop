@@ -7,6 +7,10 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pages: write
+
 jobs:
   build:
 
@@ -20,7 +24,11 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+        cache: maven
 
+    - name: Install ChromeDriver
+      uses: browser-actions/setup-chrome@latest
+      
     - name: Cache Maven Dependencies
       uses: actions/cache@v3
       with:
@@ -28,25 +36,18 @@ jobs:
           key: maven-${{ hashFiles('**\pom.xml') }}
           restore-keys: maven-
 
-    - name: Install Dependencies
-      run: mvn clean install -DskipTests
+    - name: Build feature test
+      run: mvn -B clean test    
 
-    - name: Install ChromeDriver
-      uses: browser-actions/setup-chrome@latest
-
-    - name: Run Selenium Tests
-      run: mvn verify
-
-    - name: Upload Cucumber Reports
-      uses: actions/upload-artifact@v4
+    - name: Upload Cucumber Reports      
       if: success() || failure()  # ✅ Ensures upload even if tests fail
+      uses: PavanMudigonda/html-reporter-github-pages@v1.2
       with:
           name: cucumber-html-report
-          path: target/  # ✅ Use forward slash `/` for compatibility
+          test_results: target/cucuber-reports  # ✅ Use forward slash `/` for compatibility
+          keep_reports: 20
+          gh_pages: main
+          env: CI
+          
 
-    - name: Upload Selenium Logs (if any)
-      uses: actions/upload-artifact@v4
-      if: success() || failure()  # ✅ Ensures upload even if tests fail
-      with:
-          name: selenium-logs
-          path: target/selenium.log
+  
