@@ -28,6 +28,10 @@ jobs:
 
     - name: Install ChromeDriver
       uses: browser-actions/setup-chrome@latest
+
+    - name: Verify ChromeDriver
+      run: chrome --version && chromedriver --version
+
       
     - name: Cache Maven Dependencies
       uses: actions/cache@v3
